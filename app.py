@@ -159,7 +159,7 @@ st.divider()
 # -----------------------------
 st.subheader("Run SQL Queries")
 
-def load_sql_file(path="SQLQuery1.sql"):
+def load_sql_file(path="sqlquery1.sql"):
     if not os.path.exists(path):
         return {}
 
@@ -219,4 +219,5 @@ st.components.v1.iframe(
     "&ctid=136fe6a7-243d-45b5-93a1-0ab9c53fb298",
     height=720,
     width=1200
+
 )
