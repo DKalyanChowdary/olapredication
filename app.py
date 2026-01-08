@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import pymysql
@@ -58,7 +57,20 @@ def load_base_table():
     """
     df = pd.read_sql(query, conn)
     conn.close()
+
+    # Date conversion
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+    # Numeric conversion (CRITICAL FIX)
+    numeric_cols = [
+        "booking_value",
+        "ride_distance",
+        "driver_ratings",
+        "customer_rating"
+    ]
+    for col in numeric_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
     return df
 
 df = load_base_table()
@@ -92,7 +104,10 @@ st.subheader("Key Metrics")
 c1, c2, c3, c4 = st.columns(4)
 
 c1.metric("Total Rides", len(filtered_df))
-c2.metric("Completed Rides", filtered_df[filtered_df["booking_status"] == "Success"].shape[0])
+c2.metric(
+    "Completed Rides",
+    filtered_df[filtered_df["booking_status"] == "Success"].shape[0]
+)
 c3.metric(
     "Total Revenue",
     f"₹ {filtered_df.loc[filtered_df['booking_status'] == 'Success', 'booking_value'].sum():,.0f}"
@@ -159,7 +174,7 @@ st.divider()
 # -----------------------------
 st.subheader("Run SQL Queries")
 
-def load_sql_file(path="sqlquery1.sql"):
+def load_sql_file(path="SQLQuery1.sql"):
     if not os.path.exists(path):
         return {}
 
@@ -194,6 +209,7 @@ if st.button("Run Query"):
             result_df = pd.read_sql(sql_text, conn)
             conn.close()
 
+            st.success(f"Returned {len(result_df)} rows")
             st.dataframe(result_df)
 
             st.download_button(
@@ -219,5 +235,4 @@ st.components.v1.iframe(
     "&ctid=136fe6a7-243d-45b5-93a1-0ab9c53fb298",
     height=720,
     width=1200
-
 )
